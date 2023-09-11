@@ -1,0 +1,4 @@
+.vscode
+
+# Ansible
+*.retry

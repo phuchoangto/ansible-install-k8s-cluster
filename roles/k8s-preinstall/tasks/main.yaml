@@ -1,0 +1,4 @@
+---
+- import_tasks: 01_disable-swap.yaml
+- import_tasks: 02_add-kernel-parameters.yaml
+- import_tasks: 03_install-containerd-runtime.yaml

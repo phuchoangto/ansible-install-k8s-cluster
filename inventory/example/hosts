@@ -1,0 +1,13 @@
+[all]
+#node1 ansible_host=10.0.0.1 ansible_user=root ansible_ssh_pass=123456
+#node2 ansible_host=10.0.0.2 ansible_user=root ansible_ssh_pass=123456
+
+[master_nodes]
+#node1
+
+[worker_nodes]
+#node2
+
+[k8s_cluster:children]
+master_nodes
+worker_nodes

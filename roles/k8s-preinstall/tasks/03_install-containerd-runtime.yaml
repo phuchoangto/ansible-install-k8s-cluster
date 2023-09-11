@@ -1,0 +1,52 @@
+---
+- name: Install required packages
+  ansible.builtin.package:
+    name:
+    - curl
+    - gnupg2
+    - software-properties-common
+    - apt-transport-https
+    - ca-certificates
+    state: present
+  become: true
+  become_user: root
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  become: true
+  become_user: root
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    state: present
+  become: true
+  become_user: root
+
+- name: Install containerd
+  ansible.builtin.package:
+    name:
+    - containerd.io
+    state: present
+  become: true
+  become_user: root
+
+- name: Configure containerd so that it starts using systemd as cgroup
+  ansible.builtin.copy:
+    dest: /etc/containerd/config.toml
+    content: |
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+        runtime_type = "io.containerd.runc.v2"
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+          SystemdCgroup = true
+  become: true
+  become_user: root
+
+- name: Restart containerd
+  ansible.builtin.service:
+    name: containerd
+    state: restarted
+  become: true
+  become_user: root

@@ -1,0 +1,25 @@
+---
+- name: Prepare K8S Cluster
+  hosts: k8s_cluster
+  become: true
+  become_user: root
+  gather_facts: false
+  roles:
+    - role: k8s-uninstall
+    - role: k8s-preinstall
+
+- name: Init K8S Cluster
+  hosts: k8s_master
+  become: true
+  become_user: root
+  gather_facts: false
+  roles:
+    - role: k8s-initialize
+
+- name: Join K8S Cluster
+  hosts: k8s_worker
+  become: true
+  become_user: root
+  gather_facts: false
+  roles:
+    - role: k8s-join
