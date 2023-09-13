@@ -4,7 +4,6 @@
   become: true
   become_user: root
   roles:
-    - role: k8s-uninstall
     - role: system-update
     - role: k8s-preinstall
 

@@ -8,7 +8,7 @@
 
 - name: Initialize Kubernetes Cluster on K8s Master node
   ansible.builtin.shell: |
-    kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ hostvars[inventory_hostname]['ansible_host'] }} --v=5
+    kubeadm init --pod-network-cidr=10.244.0.0/16 --v=5
 
 - name: Get kube config file
   ansible.builtin.shell: |

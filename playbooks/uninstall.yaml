@@ -1,0 +1,6 @@
+---
+- name: Uninstall k8s cluster
+  hosts: k8s_cluster
+  become: true
+  roles:
+  - role: k8s-uninstall

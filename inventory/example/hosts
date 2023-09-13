@@ -1,6 +1,6 @@
 [all]
-node1 ansible_host=4.194.184.250 ansible_user=azureuser ansible_ssh_pass=P@ssw0rd1234
-node2 ansible_host=4.193.151.55 ansible_user=azureuser ansible_ssh_pass=P@ssw0rd1234
+node1 ansible_host=20.212.30.223 ansible_user=azureuser ansible_ssh_pass=P@ssw0rd1234
+node2 ansible_host=20.212.31.113 ansible_user=azureuser ansible_ssh_pass=P@ssw0rd1234
 
 [master_nodes]
 node1

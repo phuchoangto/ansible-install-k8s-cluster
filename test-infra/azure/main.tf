@@ -53,7 +53,7 @@ resource "azurerm_public_ip" "master" {
   name                = "master-public-ip-${count.index}"
   location            = local.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
 }
 
 resource "azurerm_public_ip" "worker" {
@@ -61,7 +61,7 @@ resource "azurerm_public_ip" "worker" {
   name                = "worker-public-ip-${count.index}"
   location            = local.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
 }
 
 resource "azurerm_network_interface" "master" {
@@ -93,6 +93,18 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "KubernetesAPI"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "6443"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
