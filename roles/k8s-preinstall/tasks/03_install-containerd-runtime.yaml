@@ -25,6 +25,12 @@
   become: true
   become_user: root
 
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+  become_user: root
+
 - name: Install containerd
   ansible.builtin.package:
     name:
@@ -48,5 +54,13 @@
   ansible.builtin.service:
     name: containerd
     state: restarted
+  become: true
+  become_user: root
+
+- name: Enable containerd service
+  ansible.builtin.service:
+    name: containerd
+    enabled: true
+    state: started
   become: true
   become_user: root

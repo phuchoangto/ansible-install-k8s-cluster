@@ -1,1 +1,2 @@
-kubernetes_version: 1.24.15
+kubernetes_version: 1.27.5
+network_plugin_url: https://docs.projectcalico.org/manifests/calico.yaml

@@ -1,0 +1,28 @@
+---
+- set_fact:
+    user_name: "{{ hostvars[inventory_hostname]['ansible_user'] }}"
+
+- name: Download kube images
+  ansible.builtin.shell: |
+    kubeadm config images pull
+
+- name: Initialize Kubernetes Cluster on K8s Master node
+  ansible.builtin.shell: |
+    kubeadm init --pod-network-cidr=10.244.0.0/16 --v=5
+
+- name: Get kube config file
+  ansible.builtin.shell: |
+    mkdir -p /home/{{ user_name }}/.kube
+    cp /etc/kubernetes/admin.conf /home/{{ user_name }}/.kube/config 
+    chown {{ user_name }}:{{ user_name }} /home/{{ user_name }}/.kube/config
+
+- name: Copy kube config file to local
+  ansible.builtin.fetch:
+    src: /home/{{ user_name }}/.kube/config
+    dest: ./../kube/config
+    flat: yes
+
+- name: Install network plugin
+  ansible.builtin.shell: |
+    kubectl apply -f {{ network_plugin_url }}
+  become: false

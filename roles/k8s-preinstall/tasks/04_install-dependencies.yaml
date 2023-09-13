@@ -1,0 +1,41 @@
+---
+- name: Add Kubernetes GPG key
+  ansible.builtin.apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+  become: true
+  become_user: root
+
+- name: Add Kubernetes repository
+  ansible.builtin.apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+  become: true
+  become_user: root
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+  become_user: root
+
+- name: Install Kubernetes packages
+  ansible.builtin.package:
+    name:
+    - kubelet={{ kubernetes_version }}-00
+    - kubeadm={{ kubernetes_version }}-00
+    - kubectl={{ kubernetes_version }}-00
+    state: present
+  become: true
+  become_user: root
+
+- name: Hold Kubernetes packages
+  ansible.builtin.shell: apt-mark hold kubelet kubeadm kubectl
+
+- name: Enable kubelet service
+  ansible.builtin.service:
+    name: kubelet
+    enabled: true
+    state: started
+  become: true
+  become_user: root

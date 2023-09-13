@@ -1,0 +1,32 @@
+---
+- set_fact:
+    user_name: "{{ hostvars[inventory_hostname]['ansible_user'] }}"
+
+- name: Reset cluster
+  ansible.builtin.command: /usr/bin/kubeadm reset -f
+
+- name: Remove kubelet, kubeadm, and kubectl packages
+  ansible.builtin.package:
+    name:
+      - kubelet-{{ kubernetes_version }}
+      - kubeadm-{{ kubernetes_version }}
+      - kubectl-{{ kubernetes_version }}
+    state: absent
+
+- name: Remove Docker packages
+  ansible.builtin.package:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: absent
+
+- name: Remove directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/kubernetes
+    - /var/lib/etcd
+    - /etc/cni
+    - /home/{{ user_name }}/.kube

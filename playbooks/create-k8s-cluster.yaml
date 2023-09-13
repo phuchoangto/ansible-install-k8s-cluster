@@ -3,23 +3,22 @@
   hosts: k8s_cluster
   become: true
   become_user: root
-  gather_facts: false
   roles:
     - role: k8s-uninstall
+    - role: system-update
     - role: k8s-preinstall
 
 - name: Init K8S Cluster
-  hosts: k8s_master
+  hosts: master_nodes
   become: true
   become_user: root
-  gather_facts: false
   roles:
     - role: k8s-initialize
+    - role: k8s-get-join-command
 
 - name: Join K8S Cluster
-  hosts: k8s_worker
+  hosts: worker_nodes
   become: true
   become_user: root
-  gather_facts: false
   roles:
     - role: k8s-join

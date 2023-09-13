@@ -1,0 +1,21 @@
+---
+- set_fact:
+    user_name: "{{ hostvars[inventory_hostname]['ansible_user'] }}"
+    join_command: "{{ hostvars[groups['master_nodes'][0]]['join_command'] }}"
+
+- name: Join the cluster
+  ansible.builtin.command: "{{ join_command }}"
+
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: /home/{{ user_name }}/.kube/
+    state: directory
+  become: false
+
+- name: Copy kube config file from local
+  ansible.builtin.copy:
+    src: ./../kube/config
+    dest: /home/{{ user_name }}/.kube/config
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: 0600
