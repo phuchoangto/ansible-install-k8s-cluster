@@ -48,6 +48,22 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
+resource "azurerm_public_ip" "master" {
+  count               = local.master_count
+  name                = "master-public-ip-${count.index}"
+  location            = local.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+}
+
+resource "azurerm_public_ip" "worker" {
+  count               = local.worker_count
+  name                = "worker-public-ip-${count.index}"
+  location            = local.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+}
+
 resource "azurerm_network_interface" "master" {
   count               = local.master_count
   name                = "master-nic-${count.index}"
@@ -58,9 +74,35 @@ resource "azurerm_network_interface" "master" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.master[count.index].id
   }
 
   tags = local.tags
+}
+
+resource "azurerm_network_security_group" "nsg" {
+  name                = "${local.prefix}-nsg"
+  location            = local.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  security_rule {
+    name                       = "SSHAccess"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_subnet_network_security_group_association" "subnet_nsg_association" {
+  subnet_id                 = azurerm_subnet.subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 resource "azurerm_network_interface" "worker" {
@@ -73,6 +115,7 @@ resource "azurerm_network_interface" "worker" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.worker[count.index].id
   }
 
   tags = local.tags
@@ -134,58 +177,12 @@ resource "azurerm_linux_virtual_machine" "worker" {
   tags = local.tags
 }
 
-output "master_ips" {
-  value       = [for nic in azurerm_network_interface.master : nic.ip_configuration[0].private_ip_address]
-  description = "IP addresses of master nodes"
+output "master_public_ips" {
+  value       = [for ip in azurerm_public_ip.master : ip.ip_address]
+  description = "Public IP addresses of master nodes"
 }
 
-output "worker_ips" {
-  value       = [for nic in azurerm_network_interface.worker : nic.ip_configuration[0].private_ip_address]
-  description = "IP addresses of worker nodes"
-}
-
-resource "azurerm_public_ip" "gateway" {
-  name                = "gateway-ip"
-  location            = local.location
-  resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-
-  tags = local.tags
-}
-
-resource "azurerm_subnet" "gateway" {
-  name                 = "GatewaySubnet"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
-
-resource "azurerm_virtual_network_gateway" "gateway" {
-  name                = "gateway"
-  location            = local.location
-  resource_group_name = azurerm_resource_group.rg.name
-  type                = "Vpn"
-  vpn_type            = "RouteBased"
-  sku                 = "VpnGw1"
-  active_active       = false
-
-  ip_configuration {
-    name                          = "gw-ipconfig"
-    subnet_id                     = azurerm_subnet.gateway.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.gateway.id
-  }
-
-  vpn_client_configuration {
-    address_space        = ["172.16.0.0/24"]
-    vpn_client_protocols = ["IkeV2", "OpenVPN"]
-
-    root_certificate {
-      name             = "gateway-cert"
-      public_cert_data = filebase64("${path.module}/certs/rootCert.pem")
-    }
-  }
-
-  tags = local.tags
+output "worker_public_ips" {
+  value       = [for ip in azurerm_public_ip.worker : ip.ip_address]
+  description = "Public IP addresses of worker nodes"
 }
