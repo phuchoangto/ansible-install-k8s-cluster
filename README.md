@@ -13,7 +13,7 @@ This is a ansible script to install k8s cluster
 ## Usage
 ### 1. Create inventory file
 ```bash
-cp inventory/example inventory/my_cluster
+cp -r inventory/example inventory/my_cluster
 ```
 ### 2. Edit inventory file
 ```bash
