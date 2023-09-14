@@ -1,20 +1,30 @@
 # Ansible install k8s cluster
+This is a ansible script to install k8s cluster
 ## Table of content
-- [Ansible install k8s cluster](#ansible-install-k8s-cluster)
-  - [Table of content](#table-of-content)
-  - [Supported OS](#supported-os)
-  - [Usage](#usage)
-    - [Install](#install)
-    - [Uninstall](#uninstall)
+- [Supported OS](#supported-os)
+- [Usage](#usage)
+  - [Install](#install)
+  - [Uninstall](#uninstall)
 ## Supported OS
 - [x] Ubuntu
-- [] CentOS
+- [ ] CentOS
+## Features
+- [x] Helm
+- [ ] Multiple master nodes
 ## Usage
-### Install
+### 1. Create inventory file
 ```bash
-./run.sh -i -h <inventory_file>
+cp inventory/example inventory/my_cluster
 ```
-### Uninstall
+### 2. Edit inventory file
 ```bash
-./run.sh -u -h <inventory_file>
+vi inventory/my_cluster
+```
+### 3. Run script
+```bash
+# Install
+./run.sh -i -h inventory/my_cluster/hosts
+
+# Uninstall
+./run.sh -u -h inventory/my_cluster/hosts
 ```

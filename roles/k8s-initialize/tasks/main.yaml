@@ -26,3 +26,8 @@
   ansible.builtin.shell: |
     kubectl apply -f {{ network_plugin_url }}
   become: false
+
+- name: Install helm
+  ansible.builtin.shell: |
+    curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+  become: false
