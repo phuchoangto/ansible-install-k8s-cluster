@@ -2,9 +2,8 @@
 This is a ansible script to install k8s cluster
 ## Table of content
 - [Supported OS](#supported-os)
+- [Features](#features)
 - [Usage](#usage)
-  - [Install](#install)
-  - [Uninstall](#uninstall)
 ## Supported OS
 - [x] Ubuntu
 - [ ] CentOS
